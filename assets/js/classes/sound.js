@@ -23,7 +23,7 @@ Class.subclass('Sound', {
       // Define music
       soundManager.createSound({
         id: 'music',
-        url: '/music/' + Sound.MUSIC + '.mp3',
+        url: '/assets/music/' + Sound.MUSIC + '.mp3',
         loops: 9999,
         autoplay: false,
         autoload: true,
@@ -35,7 +35,7 @@ Class.subclass('Sound', {
         soundManager.createSound({
           id: sound,
           autoload: true,
-          url: '/sounds/' + sound + '.mp3'
+          url: '/assets/sounds/' + sound + '.mp3'
         });
       });
       

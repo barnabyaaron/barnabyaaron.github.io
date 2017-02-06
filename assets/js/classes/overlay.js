@@ -70,30 +70,21 @@ Class.subclass('OverlayBuilder', {
 });
 
 Overlay.PAGES = {
-  'enter-name': function(p) {
-    var saveCmd = "app.settings.set('name', $('#name').val());app.overlay.displayPage('welcome');";
-    
-    p.h1('Welcome Commander')
-      .p('Enter your name to begin your tests:')
-      .text('name')
-      .p('Click "Save" when you are done.')
-      .button('Save', saveCmd);
-  },
-  
   'welcome': function(p) {
-    p.h1('Welcome ' + app.settings.get('name') + '!')
+    p.h1('Welcome!')
       .p('In this game, you command a robot tank that must destroy the enemy base.')
       .p('To do this, you must write a program to move and shoot your way through each level.')
       .p('You may use the following commands, one per line:')
       .indent('<b>move, left, right, fire, wait</b>')
       .p('Once you have written your program, click the "Run Program" button to see if it works!')
-      .p('There are lots of levels.  You can select any level to play with the "Select Level" button below or under the program window on the right.')
-      .button('Select Level', "app.overlay.displayPage('select-level');");
+      .button('Start', "app.loadLevel('intro', 0)");
   },
   
   'select-level': function(p) {
     var diffs = Level.difficulties();
     var levels = '<table class="indent">';
+    var completedLast = false;
+
     for (var d = 0; d < diffs.length; d++) {
       var diff = diffs[d];
       var count = Level.levelCount(diff);
@@ -101,11 +92,17 @@ Overlay.PAGES = {
       levels += '<td style="vertical-align: middle;width: 100px;">' + diff.toUpperCase() + '</td>';
       levels += '<td>';
       for (var num = 0; num < count; num++) {
+          console.log("diff: " + diff + " level: " + num);
         var klass = 'level';
+        
         if (Level.isCompleted(Level.key(diff, num))) {
-          klass += ' completed'; 
+            completedLast = true;
+            klass += ' completed';
+            levels += '<div class="' + klass + '" onclick="app.loadLevel(\'' + diff + '\', ' + num + ')">' + (num + 1) + '</div>';
+        } else if (completedLast || (d === 0 && num === 0)) {
+            levels += '<div class="' + klass + '" onclick="app.loadLevel(\'' + diff + '\', ' + num + ')">' + (num + 1) + '</div>';
+            completedLast = false;
         }
-        levels += '<div class="'+klass+'" onclick="app.loadLevel(\''+diff+'\', '+num+')">' + (num + 1) + '</div>'; 
       }
       levels += '</td>';
       levels += '</tr>'; 
@@ -141,17 +138,6 @@ Overlay.PAGES = {
       .indent('<b>wait</b>: wait a turn')
       .indent('<b>fire</b>: fire your gun - the bullet will travel until it hits something')
       .p('Commands can be repeated multiple times by adding a count like so: <b>move(3)</b>')
-      .button('Close', "app.overlay.hide();");
-  },
-  
-  'about': function(p) {
-    p.h1('About Code Commander')
-      .p('This program is the personal project of Rob Morris of <a href="http://irongaze.com" target="_blank">Irongaze Consulting</a>.')
-      .p('It is written in pure Javascript, using <a href="http://jquery.com" target="_blank">jQuery</a>, <a href="http://craftyjs.com" target="_blank">CraftyJS</a> ' +
-         'and <a href="http://schillmania.com/projects/soundmanager2/" target="_blank">SoundManager 2</a>.')
-      .p('Source code for the project is hosted on <a href="https://github.com/irongaze/Code-Commander" target="_blank">GitHub</a>, and is licensed under the MIT license.')
-      .p('Sprites, fonts, icons, sounds and music (where not originally created) have been sourced from numerous generous contributors, and are all free for commercial use in one form or another.')
-      .p('Questions, comments or suggestions may be directed to <a href="mailto:codecommander@irongaze.com">codecommander@irongaze.com</a>.')
       .button('Close', "app.overlay.hide();");
   }
 }
